@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "reader.h"
+#include "storage.h"
 
 
 static char **buf[2];
@@ -83,6 +84,9 @@ int read(FILE *in, int n) { ///////////////////////////// USTALIC WARTOSCI ZWRAC
 	int i, j;
 	int wordc = -1;
 
+	hash_table_t *my_hash_table;
+	my_hash_table = create_hash_table(100000);
+
 	if( !in ) 
 		return 0; // ????????????
 
@@ -98,7 +102,8 @@ int read(FILE *in, int n) { ///////////////////////////// USTALIC WARTOSCI ZWRAC
 
 	do {
 		i = ++wordc % 2; // indeks dla bufora na zmiane 0 lub 1;
-		print_buf( i ); // do zamiany na dodawanie do kontenera
+		///////////////////////////////print_buf( i ); 
+		add_string(my_hash_table, buf[i]);
 		for( j = 1; j < n_gram; j++)
 			strcpy(buf[ !i ][j-1], buf[i][j]); // negacja w celu korzystania z buforow na zmiane
 
