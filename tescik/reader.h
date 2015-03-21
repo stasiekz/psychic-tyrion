@@ -3,6 +3,10 @@
 
 #define MAX_WORD_LENGTH 1024
 
+#include "storage.h"
+#include "argparser.h"
+#include "statgen.h"
+
 /*
    przydziela pamiec dla bufora do
    zczytywania slow.
@@ -24,6 +28,6 @@ void flush_buf(int buf_indx);
 
 void print_buf(int buf_indx);
 
-int read(FILE *in, int n);
+int read(tree_t tree, param_t *p, stat_t *s);
 
 #endif

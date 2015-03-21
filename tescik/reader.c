@@ -1,13 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <math.h>
-#include <time.h>
 
 #include "reader.h"
-
-#include "datadef.h"
-#include "utree.h"
+#include "storage.h"
+#include "statgen.h"
+#include "argparser.h"
 
 
 
@@ -15,6 +13,7 @@
 static char **buf[2];
 static int n_gram;
 
+/*
 int main(int argc, char **argv) {
 
 
@@ -26,6 +25,7 @@ int main(int argc, char **argv) {
 
 	return 0;
 }
+*/
 
 
 int init_buf_failed(int n) {
@@ -85,44 +85,38 @@ void print_buf(int buf_indx) {
 
 
 
-int read(FILE *in, int n) { ///////////////////////////// USTALIC WARTOSCI ZWRACANE
+int read(tree_t tree, param_t *p, stat_t *s) { ///////////////////////////// USTALIC WARTOSCI ZWRACANE
 
 	int i, j;
 	int wordc = -1;
 
-	tree_t tree = NULL;
 
-
-	if( !in ) 
-		return 0; // ????????????
-
-	if( n < 1 )
-		return 0; // ?????????????
-
-	if( init_buf_failed( n ) )
-		return 0; // ???????
+	if( init_buf_failed( p->n_gram ) )
+		return 0; 
 
 	for(i = 0; i < n_gram; i++) // ZCZYTAJ PIERWSZY N_GRAM
-		if ( (fscanf(in, "%s", buf[0][i]) != 1 ) )
+		if ( (fscanf(p->input, "%s", buf[0][i]) != 1 ) )
 			return 0;	///// ????
 
 	do {
 		i = ++wordc % 2; // indeks dla bufora na zmiane 0 lub 1;
-		///////////////////////////////print_buf( i ); 
 		tree = insert(tree, buf[i], n_gram);
 		for( j = 1; j < n_gram; j++)
 			strcpy(buf[ !i ][j-1], buf[i][j]); // negacja w celu korzystania z buforow na zmiane
 
 		flush_buf( i );
 
-	} while( (fscanf(in, "%s", buf[ !i ][n_gram-1]) ) == 1 );
+	} while( (fscanf(p->input, "%s", buf[ !i ][n_gram-1]) ) == 1 );
 
 	free_buf();
 
-	print_tree(tree, n_gram); // ??????????????????
-	free_tree(tree, n_gram);
+	print_tree(tree, n_gram); // ?????????????????? TYMCZASOWO
 
-	return wordc + n_gram; // zwroc liczbe wczytanych slow
+	fclose(p->input);
+
+	s->n_words_in = wordc + n_gram; // zapisz liczbe slow wczytanych
+
+	return 1; // ??
 }
 
 
