@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
+#include <time.h>
 
 #include "reader.h"
 #include "storage.h"
@@ -85,7 +87,7 @@ int read(FILE *in, int n) { ///////////////////////////// USTALIC WARTOSCI ZWRAC
 	int wordc = -1;
 
 	hash_table_t *my_hash_table;
-	my_hash_table = create_hash_table(100000);
+	my_hash_table = create_hash_table(10000000);
 
 	if( !in ) 
 		return 0; // ????????????
@@ -110,8 +112,19 @@ int read(FILE *in, int n) { ///////////////////////////// USTALIC WARTOSCI ZWRAC
 		flush_buf( i );
 
 	} while( (fscanf(in, "%s", buf[ !i ][n_gram-1]) ) == 1 );
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	srand(time(NULL));
+	printf("\n\n\n");
+	for(i = 0; i < 5; i++){
+		j = rand() % my_hash_table->size;
+		if(my_hash_table->table[j])
+			printf("%s ", my_hash_table->table[j]->prefix[j%2]);
+		else i--;
+	}
+	printf("\n\n\n");
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 	free_buf();
+	free_table(my_hash_table);
 
 	return wordc + n_gram; // zwroc liczbe wczytanych slow
 }

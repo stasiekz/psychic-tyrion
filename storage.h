@@ -6,14 +6,17 @@ typedef struct _list_t_ {
 	char prefix[2][1024];
 	char suffix[1000][1024];
 	int liczba_suf;
+	unsigned hash;
 	int i;
 	struct _list_t_ *next;
 
 } list_t;
 
 typedef struct _hash_table_t_ {
-	int size;       /* the size of the table */
+
+	int size;
 	list_t **table; /* the table elements */
+
 } hash_table_t;
 
 
@@ -26,28 +29,7 @@ list_t *lookup_string(hash_table_t *hashtable, char **buf);
 int add_string(hash_table_t *hashtable, char **buf);
 
 
-/*
-void free_table(hash_table_t *hashtable)
-{
-	int i;
-	list_t *list, *temp;
-
-	if (hashtable==NULL) return;
-
-	for(i=0; i<hashtable->size; i++) {
-		list = hashtable->table[i];
-		while(list!=NULL) {
-			temp = list;
-			list = list->next;
-			free(temp->str);
-			free(temp);
-		}
-	}
-
-	free(hashtable->table);
-	free(hashtable);
-}
-*/
+void free_table(hash_table_t *hashtable);
 
 /*
 int main() {
