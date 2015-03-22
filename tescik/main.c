@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 
 	param_t p;
 	stat_t stat;
-	tree_t tree = NULL;
+	storage_t storage;
 
 	/* zczytaj argumenty do struktury parametrow 
 	 */	
@@ -25,17 +25,17 @@ int main(int argc, char **argv) {
 	/* wczytaj pliki tekstowe i zapisz 
 	   dane do drzewa + dodaj dane statystyczne
 	 */
-	if ( read(&tree, &p, &stat) ) {
+	if ( read(&storage, &p, &stat) ) {
 		;	
 	}
 	/* generuj tekst + dodaj dane stat.
 	 */
-	gen_text(tree, &p, &stat);
+	gen_text(&storage, &p, &stat);
 	/* generuj statystyke
 	 */
-	gen_stat(tree, &p, &stat);
+	gen_stat(&storage, &p, &stat);
 
-	free_tree(tree, p.n_gram);
+	free_storage(&storage, p.n_gram);
 
 	return 0;
 

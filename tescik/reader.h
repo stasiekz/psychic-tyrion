@@ -28,6 +28,6 @@ void flush_buf(int buf_indx);
 
 void print_buf(int buf_indx);
 
-int read(tree_t *tree, param_t *p, stat_t *s);
+int read(storage_t *storage, param_t *p, stat_t *s);
 
 #endif

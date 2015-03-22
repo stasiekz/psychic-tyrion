@@ -4,17 +4,64 @@
 #include <stdio.h>
 
 
-tree_t insert( tree_t t, char **buf, int ngram ) {
+void add_to_storage(storage_t *storage, char **buf, int ngram) {
+
+	storage->tree = insert( storage->tree, &storage->v, buf, ngram);
+}
+
+	
+
+void free_storage(storage_t *storage, int ngram) {
+
+	free_tree(storage->tree, ngram);
+	free_node_vec(storage->v);
+
+}
+
+
+node_vec *add_to_node_vec( node_vec *v, node_t *node) {
+	
+
+	if( v == NULL) {
+		v = malloc(sizeof*v);
+		v->n_nodes = 0;
+		v->n = NULL;
+		v->n = calloc(sizeof*v->n, 50);
+		v->cap_nodes = 50;
+		
+	} else if( v->n_nodes == v->cap_nodes ) {
+		
+		v->n = realloc(v->n , 2*v->cap_nodes*sizeof*v->n);
+		v->cap_nodes *= 2;
+	}
+
+	v->n[v->n_nodes++] = node;
+	return v;
+
+}
+
+void free_node_vec(node_vec *v) {
+
+	if( v == NULL ) return ;
+	
+	free(v->n);
+	free(v);
+}
+	
+		
+
+tree_t insert( tree_t t, node_vec **v, char **buf, int ngram ) {
 	if( t == NULL ) {
 		node_t *n = malloc( sizeof *n);
 		n->d = create_data(buf, ngram);
 		n->left = n->right = NULL;
+		*v = add_to_node_vec(*v, n);
 		return n;
 	} else if( cmp_data( t->d, buf, ngram ) > 0  ) {
-		t->left = insert( t->left, buf, ngram);
+		t->left = insert( t->left, v, buf, ngram);
 		return t;
 	} else if( cmp_data( t->d, buf, ngram ) < 0 ) {
-		t->right = insert( t->right, buf, ngram);
+		t->right = insert( t->right, v, buf, ngram);
 		return t;
 	} else { // add suffix
 		insert_suffix(t->d, buf, ngram);

@@ -87,10 +87,14 @@ void print_buf(int buf_indx) {
 
 
 
-int read(tree_t *tree, param_t *p, stat_t *s) {
+int read(storage_t *storage, param_t *p, stat_t *s) {
 
 	int i, j;
 	int wordc = -1;
+
+	storage->tree = NULL;
+	storage->v = NULL;
+
 
 
 	if( init_buf_failed( p->n_gram ) )
@@ -102,7 +106,9 @@ int read(tree_t *tree, param_t *p, stat_t *s) {
 
 	do {
 		i = ++wordc % 2; // indeks dla bufora na zmiane 0 lub 1;
-		*tree = insert(*tree, buf[i], n_gram);
+	//	*tree = insert(*tree, buf[i], n_gram);
+		add_to_storage(storage, buf[i], n_gram);
+		
 		for( j = 1; j < n_gram; j++)
 			strcpy(buf[ !i ][j-1], buf[i][j]); // negacja w celu korzystania z buforow na zmiane
 

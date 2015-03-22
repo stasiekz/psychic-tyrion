@@ -5,7 +5,7 @@
 #include "argparser.h"
 #include "statgen.h"
 
-void gen_text(tree_t t, param_t *p, stat_t *s);
+void gen_text(storage_t *storage, param_t *p, stat_t *s);
 
 
 #endif

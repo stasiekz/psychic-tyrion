@@ -5,7 +5,7 @@
 #include "textgen.h"
 
 
-void gen_stat(tree_t t, param_t *p, stat_t *s) {
+void gen_stat(storage_t *storage, param_t *p, stat_t *s) {
 
 	printf("LICZBA WYRAZOW W PLIKU WEJSCIOWYM %d \n", s->n_words_in);
 
