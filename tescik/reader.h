@@ -26,6 +26,9 @@ void free_buf();
  */
 void flush_buf(int buf_indx);
 
+/*
+pomocnicza
+*/
 void print_buf(int buf_indx);
 
 int read(storage_t *storage, param_t *p, stat_t *s);

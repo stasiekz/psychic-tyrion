@@ -13,20 +13,6 @@
 static char **buf[2];
 static int n_gram;
 
-/*
-int main(int argc, char **argv) {
-
-
-	FILE *in = fopen(argv[1], "r");
-
-	printf("\n\nLICZBA SLOW : %d\n\n", read(in, atoi(argv[2])));
-
-	fclose(in);
-
-	return 0;
-}
-*/
-
 
 int init_buf_failed(int n) {
 
@@ -96,7 +82,6 @@ int read(storage_t *storage, param_t *p, stat_t *s) {
 	storage->v = NULL;
 
 
-
 	if( init_buf_failed( p->n_gram ) )
 		return 1; 
 
@@ -106,7 +91,7 @@ int read(storage_t *storage, param_t *p, stat_t *s) {
 
 	do {
 		i = ++wordc % 2; // indeks dla bufora na zmiane 0 lub 1;
-	//	*tree = insert(*tree, buf[i], n_gram);
+
 		add_to_storage(storage, buf[i], n_gram);
 		
 		for( j = 1; j < n_gram; j++)
@@ -117,8 +102,6 @@ int read(storage_t *storage, param_t *p, stat_t *s) {
 	} while( (fscanf(p->input, "%s", buf[ !i ][n_gram-1]) ) == 1 );
 
 	free_buf();
-
-	//print_tree(tree, n_gram);  ?????????????????? TYMCZASOWO
 
 	fclose(p->input);
 

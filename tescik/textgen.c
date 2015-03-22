@@ -21,8 +21,4 @@ void gen_text(storage_t *storage, param_t *p, stat_t *s) {
 	print_tree(storage->v->n[i], p->n_gram);
 
 
-	
-
-	
-
 }

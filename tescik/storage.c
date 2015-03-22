@@ -36,6 +36,7 @@ node_vec *add_to_node_vec( node_vec *v, node_t *node) {
 	}
 
 	v->n[v->n_nodes++] = node;
+
 	return v;
 
 }
@@ -63,7 +64,7 @@ tree_t insert( tree_t t, node_vec **v, char **buf, int ngram ) {
 	} else if( cmp_data( t->d, buf, ngram ) < 0 ) {
 		t->right = insert( t->right, v, buf, ngram);
 		return t;
-	} else { // add suffix
+	} else { // dodaj suffix jezezli istnieje juz taki prefix
 		insert_suffix(t->d, buf, ngram);
 		return t;
 	}
@@ -123,7 +124,7 @@ void insert_suffix(data_t *data, char **buf, int ngram) {
 	int i;
 	int cap;
 
-	for(i = 0; i < data->n_suff; i++) {
+	for(i = 0; i < data->n_suff; i++) { // sprawdz czy istnieje dany suffix jak tak to dodaj
 		if( ! (strcmp(buf[ngram-1], data->suffix[i]->suffix)) ) {
 			data->suffix[i]->occurr++;
 			return;
@@ -131,12 +132,11 @@ void insert_suffix(data_t *data, char **buf, int ngram) {
 	}
 
 	
-	if(data->n_suff == data->cap_suff){ // extend table of suffixes
+	if(data->n_suff == data->cap_suff){ // zwieksz tablice suffixow
 		cap = data->cap_suff;
-		data->suffix = realloc(data->suffix, 2*cap*sizeof*data->suffix); // 
+		data->suffix = realloc(data->suffix, 2*cap*sizeof*data->suffix);
 		for(i = cap; i < 2*cap; i++)
-			data->suffix[i] = calloc(sizeof*data->suffix[i], 1); // NIEWIADOMO DLACZEGO ????????????????????
-		//	data->suffix[i] = malloc(sizeof(suff_t));
+			data->suffix[i] = calloc(sizeof*data->suffix[i], 1);
 		data->cap_suff *= 2;
 	}
 		data->suffix[data->n_suff]->suffix = strdup(buf[ngram-1]);
@@ -148,15 +148,14 @@ data_t * create_data(char **buf, int ngram) {
 
 	int i;
 
-	data_t *newdata = malloc(sizeof*newdata); // 
+	data_t *newdata = malloc(sizeof*newdata);
 	newdata->prefix = malloc((ngram-1)*sizeof*newdata->prefix);
 
-	for(i = 0; i < ngram-1; i++) // copy prefix
+	for(i = 0; i < ngram-1; i++) // kopiuj prefix
 		newdata->prefix[i] = strdup(buf[i]);
 
 	newdata->suffix = malloc(8*sizeof*newdata->suffix);
 	for(i = 0; i < 8; i++)
-		//newdata->suffix[i] = malloc(sizeof*newdata->suffix[i]);
 		newdata->suffix[i] = calloc(sizeof*newdata->suffix[i], 1);
 
 	newdata->suffix[0]->suffix = strdup(buf[ngram-1]);

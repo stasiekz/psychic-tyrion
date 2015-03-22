@@ -29,7 +29,11 @@ typedef struct node {
 
 } node_t, *tree_t;
 
-typedef struct { // dynamiczna tablica wskaznikow na wezly drzewa
+/*
+   dynamiczna tablica 
+   wskaznikow na wezly drzewa
+ */
+typedef struct {
 
 	node_t **n;
 	int n_nodes;
@@ -58,13 +62,15 @@ tree_t insert( tree_t t, node_vec **v, char **buf, int ngram);
 
 node_t *lookup_tree(tree_t t, char **buf, int ngram);
 
-/* pomocniczna
- */
+/* pomocniczna */
 void print_tree(tree_t t, int ngram);
 
 void free_tree(tree_t t, int ngram);
 
 void insert_suffix(data_t *data, char **buf, int ngram);
+
+
+
 
 int cmp_data( data_t *data, char **buf, int ngram);
 
