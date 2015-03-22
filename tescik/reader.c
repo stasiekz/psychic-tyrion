@@ -71,6 +71,7 @@ void flush_buf(int buf_indx) {
 }
 
 
+/*
 void print_buf(int buf_indx) {
 
 	int i;
@@ -82,25 +83,26 @@ void print_buf(int buf_indx) {
 		printf("%s ", buf[buf_indx][i]);
 	printf("\n");
 }
+*/
 
 
 
-int read(tree_t tree, param_t *p, stat_t *s) { ///////////////////////////// USTALIC WARTOSCI ZWRACANE
+int read(tree_t *tree, param_t *p, stat_t *s) {
 
 	int i, j;
 	int wordc = -1;
 
 
 	if( init_buf_failed( p->n_gram ) )
-		return 0; 
+		return 1; 
 
 	for(i = 0; i < n_gram; i++) // ZCZYTAJ PIERWSZY N_GRAM
 		if ( (fscanf(p->input, "%s", buf[0][i]) != 1 ) )
-			return 0;	///// ????
+			return -2;	// niewlasciwy parametr
 
 	do {
 		i = ++wordc % 2; // indeks dla bufora na zmiane 0 lub 1;
-		tree = insert(tree, buf[i], n_gram);
+		*tree = insert(*tree, buf[i], n_gram);
 		for( j = 1; j < n_gram; j++)
 			strcpy(buf[ !i ][j-1], buf[i][j]); // negacja w celu korzystania z buforow na zmiane
 
@@ -110,13 +112,13 @@ int read(tree_t tree, param_t *p, stat_t *s) { ///////////////////////////// UST
 
 	free_buf();
 
-	print_tree(tree, n_gram); // ?????????????????? TYMCZASOWO
+	//print_tree(tree, n_gram);  ?????????????????? TYMCZASOWO
 
 	fclose(p->input);
 
 	s->n_words_in = wordc + n_gram; // zapisz liczbe slow wczytanych
 
-	return 1; // ??
+	return 0;
 }
 
 

@@ -23,7 +23,6 @@ typedef struct node {
 
 
 
-
 tree_t insert( tree_t t, char **buf, int ngram);
 
 void print_tree(tree_t t, int ngram);
@@ -37,6 +36,8 @@ int cmp_data( data_t *data, char **buf, int ngram);
 data_t * create_data(char **buf, int ngram);
 
 void free_data(data_t *data, int ngram);
+
+node_t *lookup_tree(tree_t t, char **buf, int ngram);
 
 
 #endif

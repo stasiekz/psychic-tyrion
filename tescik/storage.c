@@ -23,6 +23,20 @@ tree_t insert( tree_t t, char **buf, int ngram ) {
 
 }
 
+node_t *lookup_tree(tree_t t, char **buf, int ngram) {
+
+	if( t == NULL ) return NULL;
+
+        if( cmp_data( t->d, buf, ngram ) > 0  ) {
+                return lookup_tree(t->left, buf, ngram);
+        } else if( cmp_data( t->d, buf, ngram ) < 0 ) {
+                return lookup_tree(t->right, buf, ngram);
+        } else {
+                return t;
+        }
+
+}
+
 void print_tree(tree_t t, int ngram) {
 
 	int i;
@@ -46,7 +60,7 @@ void print_tree(tree_t t, int ngram) {
 	
 
 
-int cmp_data( data_t *data, char **buf, int ngram) { // compare suffix
+int cmp_data( data_t *data, char **buf, int ngram) { // compare prefix
 
 	int i, j;
 	for(i = 0; i < ngram-1; i++)
