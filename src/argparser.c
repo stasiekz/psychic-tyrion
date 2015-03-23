@@ -1,6 +1,8 @@
 #include "argparser.h"
 
 #include <stdlib.h>
+#include <getopt.h>
+#include <stdio.h>
 
 int parse_args(int argc, char **argv, param_t *p) {
 

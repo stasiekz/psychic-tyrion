@@ -1,12 +1,11 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
 #include "reader.h"
 #include "storage.h"
 #include "statgen.h"
 #include "argparser.h"
 
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 
 

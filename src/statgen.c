@@ -4,6 +4,8 @@
 #include "argparser.h"
 #include "textgen.h"
 
+#include <stdio.h>
+
 
 void gen_stat(storage_t *storage, param_t *p, stat_t *s) {
 
