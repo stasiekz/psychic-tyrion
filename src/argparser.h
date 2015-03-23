@@ -11,6 +11,7 @@ typedef struct {
 	int help; // zmienna logiczna do wyswietlania helpa
 
 	FILE *input; //  bedzie tablica uchwytow do plikow wejsciowych
+	int n_inputs; // liczba plikow wejsciowych
 	FILE *base_file; // ew. plik przechodni
 	FILE *output; // plik do wygenerowania tekstu wyjsciowego
 	FILE *stat_file; // ew. plik do wygenerowania statystyki

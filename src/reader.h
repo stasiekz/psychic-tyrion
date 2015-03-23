@@ -31,6 +31,7 @@ pomocnicza
 */
 void print_buf(int buf_indx);
 
+/* wczytaj dane z plikow wejsciowych do kontenera danych */
 int read(storage_t *storage, param_t *p, stat_t *s);
 
 #endif
