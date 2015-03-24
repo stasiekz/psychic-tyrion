@@ -72,7 +72,7 @@ void print_buf(int buf_indx) {
 
 
 
-int read(storage_t *storage, param_t *p, stat_t *s) {
+int read(storage_t *storage, param_t p, stat_t *s) {
 
 	int i, j;
 	int wordc = -1;
@@ -81,11 +81,11 @@ int read(storage_t *storage, param_t *p, stat_t *s) {
 	storage->v = NULL;
 
 
-	if( init_buf_failed( p->n_gram ) )
+	if( init_buf_failed( p.n_gram ) )
 		return 1; 
 
 	for(i = 0; i < n_gram; i++) // ZCZYTAJ PIERWSZY N_GRAM
-		if ( (fscanf(p->input, "%s", buf[0][i]) != 1 ) )
+		if ( (fscanf(p.input, "%s", buf[0][i]) != 1 ) )
 			return -2;	// niewlasciwy parametr
 
 	do {
@@ -98,11 +98,11 @@ int read(storage_t *storage, param_t *p, stat_t *s) {
 
 		flush_buf( i );
 
-	} while( (fscanf(p->input, "%s", buf[ !i ][n_gram-1]) ) == 1 );
+	} while( (fscanf(p.input, "%s", buf[ !i ][n_gram-1]) ) == 1 );
 
 	free_buf();
 
-	fclose(p->input);
+	fclose(p.input);
 
 	s->n_words_in = wordc + n_gram; // zapisz liczbe slow wczytanych
 

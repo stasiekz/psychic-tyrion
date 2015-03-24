@@ -25,15 +25,15 @@ int main(int argc, char **argv) {
 	/* wczytaj pliki tekstowe i zapisz 
 	   dane do drzewa + dodaj dane statystyczne
 	 */
-	if ( read(&storage, &p, &stat) ) {
+	if ( read(&storage, p, &stat) ) {
 		;	
 	}
 	/* generuj tekst + dodaj dane stat.
 	 */
-	gen_text(&storage, &p, &stat);
+	gen_text(storage, p, &stat);
 	/* generuj statystyke
 	 */
-	gen_stat(&storage, &p, &stat);
+	gen_stat(storage, p, stat);
 
 	free_storage(&storage, p.n_gram);
 

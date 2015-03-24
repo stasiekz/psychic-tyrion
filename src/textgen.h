@@ -9,7 +9,7 @@
    na podstawie danych w storage +
    zapisz dane statystyczne do struktury s
  */
-void gen_text(storage_t *storage, param_t *p, stat_t *s);
+void gen_text(storage_t storage, param_t p, stat_t *s);
 
 
 #endif

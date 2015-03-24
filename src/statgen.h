@@ -16,6 +16,6 @@ typedef struct {
 
 /* generuj stastyke zgodnie z parametrami w p, na podstawie
    danych z s , korzysta z storage */
-void gen_stat(storage_t *storage, param_t *p, stat_t *s);
+void gen_stat(storage_t storage, param_t p, stat_t s);
 
 #endif
