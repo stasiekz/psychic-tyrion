@@ -10,7 +10,7 @@ void add_to_storage(storage_t *storage, char **buf, int ngram) {
 	storage->tree = insert( storage->tree, &storage->v, buf, ngram);
 }
 
-	
+
 
 void free_storage(storage_t *storage, int ngram) {
 
@@ -21,7 +21,7 @@ void free_storage(storage_t *storage, int ngram) {
 
 
 node_vec *add_to_node_vec( node_vec *v, node_t *node) {
-	
+
 
 	if( v == NULL) {
 		v = malloc(sizeof*v);
@@ -29,9 +29,9 @@ node_vec *add_to_node_vec( node_vec *v, node_t *node) {
 		v->n = NULL;
 		v->n = calloc(sizeof*v->n, 50);
 		v->cap_nodes = 50;
-		
+
 	} else if( v->n_nodes == v->cap_nodes ) {
-		
+
 		v->n = realloc(v->n , 2*v->cap_nodes*sizeof*v->n);
 		v->cap_nodes *= 2;
 	}
@@ -45,12 +45,12 @@ node_vec *add_to_node_vec( node_vec *v, node_t *node) {
 void free_node_vec(node_vec *v) {
 
 	if( v == NULL ) return ;
-	
+
 	free(v->n);
 	free(v);
 }
-	
-		
+
+
 
 tree_t insert( tree_t t, node_vec **v, char **buf, int ngram ) {
 	if( t == NULL ) {
@@ -66,7 +66,8 @@ tree_t insert( tree_t t, node_vec **v, char **buf, int ngram ) {
 		t->right = insert( t->right, v, buf, ngram);
 		return t;
 	} else { // dodaj suffix jezezli istnieje juz taki prefix
-		insert_suffix(t->d, buf, ngram);
+		if( ngram > 1 ) 
+			insert_suffix(t->d, buf, ngram);
 		return t;
 	}
 
@@ -76,24 +77,25 @@ node_t *lookup_tree(tree_t t, char **buf, int ngram) {
 
 	if( t == NULL ) return NULL;
 
-        if( cmp_data( t->d, buf, ngram ) > 0  ) {
-                return lookup_tree(t->left, buf, ngram);
-        } else if( cmp_data( t->d, buf, ngram ) < 0 ) {
-                return lookup_tree(t->right, buf, ngram);
-        } else {
-                return t;
-        }
+	if( cmp_data( t->d, buf, ngram ) > 0  ) {
+		return lookup_tree(t->left, buf, ngram);
+	} else if( cmp_data( t->d, buf, ngram ) < 0 ) {
+		return lookup_tree(t->right, buf, ngram);
+	} else {
+		return t;
+	}
 
 }
 
 void print_tree(tree_t t, int ngram) {
 
 	int i;
+	int prefix_size = ngram == 1 ? 1 : ngram-1;
 
 	if(t == NULL) return;
 
 	printf("\n\nPREFIX:       ");
-	for(i = 0; i < ngram-1; i++) {
+	for(i = 0; i < prefix_size; i++) {
 		printf(" %s ", t->d->prefix[i]);
 	}
 
@@ -106,13 +108,15 @@ void print_tree(tree_t t, int ngram) {
 	print_tree(t->right, ngram);
 }
 
-	
+
 
 
 int cmp_data( data_t *data, char **buf, int ngram) { // compare prefix
 
 	int i, j;
-	for(i = 0; i < ngram-1; i++)
+	int prefix_size = ngram == 1 ? 1 : ngram-1;
+
+	for(i = 0; i < prefix_size; i++)
 		if((j = (strcmp(buf[i], data->prefix[i]))))
 			return j;
 	return 0;
@@ -132,7 +136,7 @@ void insert_suffix(data_t *data, char **buf, int ngram) {
 		}
 	}
 
-	
+
 	if(data->n_suff == data->cap_suff){ // zwieksz tablice suffixow
 		cap = data->cap_suff;
 		data->suffix = realloc(data->suffix, 2*cap*sizeof*data->suffix);
@@ -140,29 +144,37 @@ void insert_suffix(data_t *data, char **buf, int ngram) {
 			data->suffix[i] = calloc(sizeof*data->suffix[i], 1);
 		data->cap_suff *= 2;
 	}
-		data->suffix[data->n_suff]->suffix = strdup(buf[ngram-1]);
-		data->suffix[data->n_suff]->occurr = 1;
-		data->n_suff++;
+	data->suffix[data->n_suff]->suffix = strdup(buf[ngram-1]);
+	data->suffix[data->n_suff]->occurr = 1;
+	data->n_suff++;
 }
 
 data_t * create_data(char **buf, int ngram) {
 
 	int i;
+	int prefix_size = ngram == 1 ? 1 : ngram-1;
 
 	data_t *newdata = malloc(sizeof*newdata);
-	newdata->prefix = malloc((ngram-1)*sizeof*newdata->prefix);
+	newdata->prefix = malloc(prefix_size*sizeof*newdata->prefix);
 
-	for(i = 0; i < ngram-1; i++) // kopiuj prefix
+	for(i = 0; i < prefix_size; i++) // kopiuj prefix
 		newdata->prefix[i] = strdup(buf[i]);
 
-	newdata->suffix = malloc(8*sizeof*newdata->suffix);
-	for(i = 0; i < 8; i++)
-		newdata->suffix[i] = calloc(sizeof*newdata->suffix[i], 1);
+	if ( prefix_size > 1 ) { // nie unigram
 
-	newdata->suffix[0]->suffix = strdup(buf[ngram-1]);
-	newdata->suffix[0]->occurr = 1;
-	newdata->n_suff = 1;
-	newdata->cap_suff = 8;
+		newdata->suffix = malloc(8*sizeof*newdata->suffix);
+		for(i = 0; i < 8; i++)
+			newdata->suffix[i] = calloc(sizeof*newdata->suffix[i], 1);
+
+		newdata->suffix[0]->suffix = strdup(buf[prefix_size]);
+		newdata->suffix[0]->occurr = 1;
+		newdata->n_suff = 1;
+		newdata->cap_suff = 8;
+
+	} else { // unigram
+		newdata->n_suff = 0;
+		newdata->cap_suff = 0;
+	}
 
 	return newdata;
 
@@ -172,31 +184,37 @@ data_t * create_data(char **buf, int ngram) {
 
 void free_data(data_t *d, int ngram) {
 
-        int i;
-        if(d == NULL) return;
+	int i;
+	int prefix_size = ngram == 1 ? 1 : ngram-1;
 
-        for(i = 0; i < ngram-1; i++)
-                free(d->prefix[i]);
-        free(d->prefix);
-	
-        for(i = 0; i < d->cap_suff; i++) {
-                free(d->suffix[i]->suffix);
-                free(d->suffix[i]);
-        }
-	
-        free(d->suffix);
+	if(d == NULL) return;
+
+	for(i = 0; i < prefix_size; i++)
+		free(d->prefix[i]);
+	free(d->prefix);
+
+	if( ngram > 1 ) { // nie unigram
+		for(i = 0; i < d->cap_suff; i++) {
+			free(d->suffix[i]->suffix);
+			free(d->suffix[i]);
+		}
+
+		free(d->suffix);
+	}
+
 	free(d);
+
 }
 
 
 void free_tree(tree_t t, int ngram) {
 
-        if( t == NULL) return;
+	if( t == NULL) return;
 	free_data(t->d, ngram);
 
-        free_tree(t->left, ngram);
-        free_tree(t->right, ngram);
-        free(t);
+	free_tree(t->left, ngram);
+	free_tree(t->right, ngram);
+	free(t);
 }
 
 
