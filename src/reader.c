@@ -86,8 +86,10 @@ int read(storage_t *storage, param_t p, stat_t *s) {
 
 	for(k = 0; k < p.inputs; k++) {
 		for(i = 0; i < n_gram; i++) // ZCZYTAJ PIERWSZY N_GRAM
-			if ( (fscanf(p.input[k], "%s", buf[0][i]) != 1 ) )
-				return -2;	// niewlasciwy parametr
+			if ( (fscanf(p.input[k], "%s", buf[0][i]) != 1 ) ) {
+				free_buf();
+				exit(2);	// niewlasciwy parametr TODO
+			}
 
 		do {
 			i = ++wordc % 2; // indeks dla bufora na zmiane 0 lub 1;
