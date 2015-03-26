@@ -27,7 +27,8 @@ int parse_args(int argc, char **argv, param_t *p) {
 	p->n_words = 100;
 	p->n_parag = 4;
 	p->n_gram = 2;
-	p->help = 0;
+	p->show_help = 0;
+	p->gen_stat = 0;
 
 	p->input = calloc(1, sizeof*p->input);
 	p->input[0] = stdin;
@@ -53,7 +54,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 						for(i = 0; i < p->inputs; i++)
 							fclose(p->input[i]);
 						free(p->input);
-						return -1;
+						exit(1);
 					}
 					p->inputs++;
 
@@ -61,18 +62,22 @@ int parse_args(int argc, char **argv, param_t *p) {
 				break;
 
 			case 'w': 
-				p->n_words = atoi(optarg);
+				if( (p->n_words = atoi(optarg) ) <= 0 )
+					exit(2); // TODO zwolnic pliki
 				break;
 
 			case 'p':  
-				p->n_parag = atoi(optarg);
+				if( (p->n_parag = atoi(optarg) ) <= 0 )
+					exit(2); // TODO zwolnic pliki
 				break;
 
 			case 'n':   
-				p->n_gram = atoi(optarg);
+				if( (p->n_gram = atoi(optarg) ) <= 0 )
+					exit(2); // TODO zwolnic pliki
 				break;
 
 			case 's':   
+				p->gen_stat = 1;
 				p->stat_file = fopen(optarg, "w");
 				break;
 
@@ -88,12 +93,11 @@ int parse_args(int argc, char **argv, param_t *p) {
 				break;
 
 			case 'h':   
-				p->help = 1;
+				p->show_help = 1;
 				break;
 
 			case -1:
 				break;
-
 
 			default:   
 				abort ();
@@ -101,11 +105,6 @@ int parse_args(int argc, char **argv, param_t *p) {
 		}
 
 	} while (next_option != -1);
-
-
-	if( 0 ) {
-		return -2; // niewlasciwe argumenty
-	}
 
 	return 0;
 
