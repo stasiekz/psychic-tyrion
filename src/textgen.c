@@ -2,7 +2,6 @@
 #include "argparser.h"
 #include "statgen.h"
 #include "textgen.h"
-#include "reader.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,28 +20,25 @@ void add_buf( char **buf, char **pref, char *suf, int ngram ){
 
 void gen_text(storage_t storage, param_t p, stat_t *s) {
 
-	//		print_tree(storage.tree, p.n_gram);
-
-
-
 	srand( time(NULL) );
 
-	int n = 0; // zmienna do liczenia liczby slow wydrukowanych
 	int i;
+	int n = 0; // zmienna do liczenia liczby slow wydrukowanych
+	int parag = p.n_words / p.n_parag;
 	int prefix_size = p.n_gram == 1 ? 1 : p.n_gram-1;
 	char **buf = malloc (prefix_size*sizeof*buf);
 	char *suffix;
 	node_t *node = NULL;
 
 
-
 	while( n < p.n_words ) {
 
-		if( !node ) {
+		if( !node ) { // nie ma takiego ngramu(prefixu)
 			node = storage.v->n[ rand()%storage.v->n_nodes ]; // losuj wezel drzewa
 
 			if( p.n_gram == 1) { // unigram
 
+				if( n % parag == 0 ) fprintf(p.output, "\t");
 				fprintf(p.output, "%s ", node->d->prefix[0]); // wypisz prefix
 				node = NULL;
 				n++;
@@ -52,7 +48,7 @@ void gen_text(storage_t storage, param_t p, stat_t *s) {
 				for( i = 0; i < prefix_size; i++)
 					fprintf(p.output, "%s ", node->d->prefix[i]); // wypisz prefix
 				fprintf(p.output, "%s ", suffix = node->d->suffix[ rand()%node->d->n_suff ] ); // losuj i wypisz suffix
-				n += p.n_gram;
+				n += p.n_gram; //TODO liczba wyrazow
 				add_buf(buf, node->d->prefix, suffix, p.n_gram); // dodaj dane do bufora
 			}
 
@@ -61,18 +57,12 @@ void gen_text(storage_t storage, param_t p, stat_t *s) {
 			fprintf(p.output, "%s ", suffix = node->d->suffix[ rand()%node->d->n_suff ] ); // losuj i wypisz suffix
 			add_buf(buf, node->d->prefix, suffix, p.n_gram);
 			n++;
-
-
 		}
 
 		node = lookup_tree(storage.tree, buf, p.n_gram);
 	}
 
-
-
 	free(buf);
-
-
-
+	fclose(p.output);
 }
 
