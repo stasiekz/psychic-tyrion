@@ -18,8 +18,8 @@ int main(int argc, char **argv) {
 
 	/* zczytaj argumenty do struktury parametrow 
 	 */	
-	if( parse_args(argc, argv, &p) ) {
-		;
+	if( ( parse_args(argc, argv, &p)) == -1 ) {
+		return -1;
 
 	}
 	/* wczytaj pliki tekstowe i zapisz 

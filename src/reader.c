@@ -57,24 +57,24 @@ void flush_buf(int buf_indx) {
 
 
 /*
-void print_buf(int buf_indx) {
+   void print_buf(int buf_indx) {
 
-	int i;
+   int i;
 
-	if(buf_indx != 0 && buf_indx != 1)
-		return;
+   if(buf_indx != 0 && buf_indx != 1)
+   return;
 
-	for(i = 0; i < n_gram; i++)
-		printf("%s ", buf[buf_indx][i]);
-	printf("\n");
-}
-*/
+   for(i = 0; i < n_gram; i++)
+   printf("%s ", buf[buf_indx][i]);
+   printf("\n");
+   }
+ */
 
 
 
 int read(storage_t *storage, param_t p, stat_t *s) {
 
-	int i, j;
+	int i, j, k;
 	int wordc = -1;
 
 	storage->tree = NULL;
@@ -84,25 +84,30 @@ int read(storage_t *storage, param_t p, stat_t *s) {
 	if( init_buf_failed( p.n_gram ) )
 		return 1; 
 
-	for(i = 0; i < n_gram; i++) // ZCZYTAJ PIERWSZY N_GRAM
-		if ( (fscanf(p.input, "%s", buf[0][i]) != 1 ) )
-			return -2;	// niewlasciwy parametr
+	for(k = 0; k < p.inputs; k++) {
+		for(i = 0; i < n_gram; i++) // ZCZYTAJ PIERWSZY N_GRAM
+			if ( (fscanf(p.input[k], "%s", buf[0][i]) != 1 ) )
+				return -2;	// niewlasciwy parametr
 
-	do {
-		i = ++wordc % 2; // indeks dla bufora na zmiane 0 lub 1;
+		do {
+			i = ++wordc % 2; // indeks dla bufora na zmiane 0 lub 1;
 
-		add_to_storage(storage, buf[i], n_gram);
-		
-		for( j = 1; j < n_gram; j++)
-			strcpy(buf[ !i ][j-1], buf[i][j]); // negacja w celu korzystania z buforow na zmiane
+			add_to_storage(storage, buf[i], n_gram); // TODO zrobic zeby zwracal cos jak zabraknie pamieci
 
-		flush_buf( i );
+			for( j = 1; j < n_gram; j++)
+				strcpy(buf[ !i ][j-1], buf[i][j]); // negacja w celu korzystania z buforow na zmiane
 
-	} while( (fscanf(p.input, "%s", buf[ !i ][n_gram-1]) ) == 1 );
+			flush_buf( i );
+
+		} while( (fscanf(p.input[k], "%s", buf[ !i ][n_gram-1]) ) == 1 );
+	}
+
+	for(i = 0; i < p.inputs; i++) // pozamykaj pliki wejsciowe i zwolnij tablice do ich trzymania
+		fclose(p.input[i]);
+	free(p.input);
 
 	free_buf();
 
-	fclose(p.input);
 
 	s->n_words_in = wordc + n_gram; // zapisz liczbe slow wczytanych
 
