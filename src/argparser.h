@@ -8,8 +8,8 @@ typedef struct {
 	int n_words; // liczba slow do wygenerowania
 	int n_parag; // liczba paragrafow do wygenerowania
 	int n_gram;
-	int help; // zmienna logiczna do wyswietlania helpa
-	int stat; // zmienna logiczna do wyswietlania statystyk
+	int show_help; // zmienna logiczna do wyswietlania helpa
+	int gen_stat; // zmienna logiczna do wyswietlania statystyk
 
 	FILE **input; //  bedzie tablica uchwytow do plikow wejsciowych
 	int inputs; // liczba plikow wejsciowych
