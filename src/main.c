@@ -18,10 +18,9 @@ int main(int argc, char **argv) {
 
 	/* zczytaj argumenty do struktury parametrow 
 	 */	
-	if( ( parse_args(argc, argv, &p)) == -1 ) {
-		return -1;
+	parse_args(argc, argv, &p);
 
-	}
+
 	/* wczytaj pliki tekstowe i zapisz 
 	   dane do drzewa + dodaj dane statystyczne
 	 */
@@ -37,6 +36,6 @@ int main(int argc, char **argv) {
 
 	free_storage(&storage, p.n_gram);
 
-	return 0;
+	return EXIT_SUCCESS;
 
 }
