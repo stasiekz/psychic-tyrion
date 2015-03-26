@@ -9,7 +9,7 @@
 
 void gen_stat(storage_t storage, param_t p, stat_t s) {
 
-	printf("LICZBA WYRAZOW W PLIKU WEJSCIOWYM %d \n", s.n_words_in);
-	printf("LICZBA WEZLOW W DRZEWIE %d \n\n\n", storage.v->n_nodes );
+	printf("\n\n\nLICZBA WYRAZOW W PLIKU WEJSCIOWYM %d \n", s.n_words_in);
+	printf("\n\n\nLICZBA WEZLOW W DRZEWIE %d \n\n\n", storage.v->n_nodes );
 
 }

@@ -1,22 +1,10 @@
 #ifndef  _STORAGE_H_
 #define  _STORAGE_H_
 
-/* struktura dla suffixu */
-typedef struct {
-	char *suffix;
-	int occurr;
-} suff_t;
-
 /* glowna struktura danych */
 typedef struct {
 	char **prefix;
-	suff_t **suffix;
-
-	/*
-	   int *index;
-	   int total_suff;
-	   int cap_index;
-	 */
+	char **suffix;
 
 	int n_suff;
 	int cap_suff;

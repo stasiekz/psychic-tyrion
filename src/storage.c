@@ -27,7 +27,8 @@ node_vec *add_to_node_vec( node_vec *v, node_t *node) {
 		v = malloc(sizeof*v);
 		v->n_nodes = 0;
 		v->n = NULL;
-		v->n = calloc(sizeof*v->n, 50);
+		//v->n = calloc(sizeof*v->n, 50);
+		v->n = calloc(50, sizeof*v->n);
 		v->cap_nodes = 50;
 
 	} else if( v->n_nodes == v->cap_nodes ) {
@@ -101,7 +102,7 @@ void print_tree(tree_t t, int ngram) {
 
 	printf("\n\nSUFFIX [%d]\n", t->d->n_suff);
 	for(i = 0; i < t->d->n_suff; i++)
-		printf(" %s[%d] ", t->d->suffix[i]->suffix, t->d->suffix[i]->occurr);
+		printf(" %s ", t->d->suffix[i]);
 	printf("\n------------------------------------\n\n");		
 
 	print_tree(t->left, ngram);
@@ -126,27 +127,13 @@ int cmp_data( data_t *data, char **buf, int ngram) { // compare prefix
 
 void insert_suffix(data_t *data, char **buf, int ngram) {
 
-	int i;
-	int cap;
 
-	for(i = 0; i < data->n_suff; i++) { // sprawdz czy istnieje dany suffix jak tak to dodaj
-		if( ! (strcmp(buf[ngram-1], data->suffix[i]->suffix)) ) {
-			data->suffix[i]->occurr++;
-			return;
-		}
-	}
-
-
-	if(data->n_suff == data->cap_suff){ // zwieksz tablice suffixow
-		cap = data->cap_suff;
-		data->suffix = realloc(data->suffix, 2*cap*sizeof*data->suffix);
-		for(i = cap; i < 2*cap; i++)
-			data->suffix[i] = calloc(sizeof*data->suffix[i], 1);
+	if(data->n_suff == data->cap_suff){ // zwieksz tablice suffixow z powtorzeniami
+		data->suffix = realloc(data->suffix, 2*data->cap_suff*sizeof*data->suffix);
 		data->cap_suff *= 2;
 	}
-	data->suffix[data->n_suff]->suffix = strdup(buf[ngram-1]);
-	data->suffix[data->n_suff]->occurr = 1;
-	data->n_suff++;
+	data->suffix[data->n_suff++] = strdup(buf[ngram-1]);
+
 }
 
 data_t * create_data(char **buf, int ngram) {
@@ -160,18 +147,16 @@ data_t * create_data(char **buf, int ngram) {
 	for(i = 0; i < prefix_size; i++) // kopiuj prefix
 		newdata->prefix[i] = strdup(buf[i]);
 
-	if ( prefix_size > 1 ) { // nie unigram
+	if ( ngram > 1 ) { // nie unigram
 
-		newdata->suffix = malloc(8*sizeof*newdata->suffix);
-		for(i = 0; i < 8; i++)
-			newdata->suffix[i] = calloc(sizeof*newdata->suffix[i], 1);
+		newdata->suffix = malloc(10*sizeof*newdata->suffix);
 
-		newdata->suffix[0]->suffix = strdup(buf[prefix_size]);
-		newdata->suffix[0]->occurr = 1;
+		newdata->cap_suff = 10;
+		newdata->suffix[0] = strdup(buf[prefix_size]); // kopiuj pierwszu suffix
 		newdata->n_suff = 1;
-		newdata->cap_suff = 8;
 
 	} else { // unigram
+		newdata->suffix = NULL;
 		newdata->n_suff = 0;
 		newdata->cap_suff = 0;
 	}
@@ -194,8 +179,8 @@ void free_data(data_t *d, int ngram) {
 	free(d->prefix);
 
 	if( ngram > 1 ) { // nie unigram
-		for(i = 0; i < d->cap_suff; i++) {
-			free(d->suffix[i]->suffix);
+
+		for(i = 0; i < d->n_suff; i++) {
 			free(d->suffix[i]);
 		}
 
