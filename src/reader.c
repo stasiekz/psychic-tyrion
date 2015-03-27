@@ -88,7 +88,7 @@ int read(storage_t *storage, param_t p, stat_t *s) {
 		for(i = 0; i < n_gram; i++) // ZCZYTAJ PIERWSZY N_GRAM
 			if ( (fscanf(p.input[k], "%s", buf[0][i]) != 1 ) ) {
 				free_buf();
-				exit(2);	// niewlasciwy parametr TODO
+				exit(2);	// niewlasciwy parametr TODO zwolnic reszte plikow
 			}
 
 		do {
@@ -105,7 +105,7 @@ int read(storage_t *storage, param_t p, stat_t *s) {
 	}
 
 	for(i = 0; i < p.inputs; i++) // pozamykaj pliki wejsciowe i zwolnij tablice do ich trzymania
-		fclose(p.input[i]);
+		fclose(p.input[i]); // TODO dodaj funkcje do robienia tego
 	free(p.input);
 
 	free_buf();

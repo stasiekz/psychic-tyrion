@@ -13,26 +13,25 @@ int parse_args(int argc, char **argv, param_t *p) {
 	const char* const short_options = "f:w:p:n:s:o:b:h";
 	/* An array describing valid long options.  */
 	const struct option long_options[] = {
-		{ "file", 1, NULL, 'f' },
-		{ "nwords", 1, NULL, 'w' },
-		{ "nparag", 1, NULL, 'p' },
-		{ "ngram",  1, NULL, 'n' },
-		{ "stat",   1, NULL, 's' },
-		{ "output", 1, NULL, 'o' },
-		{ "basefile", 1, NULL, 'b' },
-		{ "help", 0, NULL, 'h' },
-		{ NULL,       0, NULL, 0   }
+		{ "file", required_argument, NULL, 'f' },
+		{ "nwords", required_argument, NULL, 'w' },
+		{ "nparag", required_argument, NULL, 'p' },
+		{ "ngram",  required_argument, NULL, 'n' },
+		{ "stat",   optional_argument, NULL, 's' },
+		{ "output", required_argument, NULL, 'o' },
+		{ "basefile", required_argument, NULL, 'b' },
+		{ "help", no_argument, NULL, 'h' },
+		{ NULL,       no_argument, NULL, 0   }
 	};
 
-	p->n_words = 100;
-	p->n_parag = 4;
-	p->n_gram = 2;
-	p->show_help = 0;
+	p->n_words = DEFAULT_NUMBER_OF_WORDS;
+	p->n_parag = DEFAULT_NUMBER_OF_PARAGRAPHS;
+	p->n_gram = DEFAULT_N_GRAM;
+	p->show_help = 1;
 	p->gen_stat = 0;
 
-	p->input = calloc(1, sizeof*p->input);
-	p->input[0] = stdin;
-	p->inputs = 1;
+	p->input = NULL;
+	p->inputs = 0;
 	p->output = stdout;
 	p->stat_file = stdout;
 
@@ -44,7 +43,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 			case 'f':
 
 				optind--;
-				for(p->inputs = 0 ;optind < argc && *argv[optind] != '-'; optind++) {
+				for(p->inputs = 0; optind < argc && *argv[optind] != '-'; optind++) {
 
 					p->input = realloc(p->input, (p->inputs+1)*sizeof*p->input); // poszerz tablice uchytow do plikow o 1
 					p->input[p->inputs] = fopen(argv[optind], "r");
@@ -59,6 +58,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 					p->inputs++;
 
 				} 
+				p->show_help = 0;
 				break;
 
 			case 'w': 
@@ -84,7 +84,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 			case 'o':   
 				if( !( p->output = fopen(optarg, "w")) ) {
 					fprintf(stderr, "%s: nie moge utworzyc pliku wynikowego: \"%s\"", argv[0], optarg);
-					return -3; // TODO
+					exit(3); // TODO zwolnic pliki
 				}
 				break;
 

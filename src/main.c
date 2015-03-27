@@ -20,6 +20,11 @@ int main(int argc, char **argv) {
 	 */	
 	parse_args(argc, argv, &p);
 
+	if(argc == 1 || p.show_help == 1 ) {
+		printf("%s%d\n", usage);
+		exit(2); // TODO
+	}
+
 
 	/* wczytaj pliki tekstowe i zapisz 
 	   dane do drzewa + dodaj dane statystyczne

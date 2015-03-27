@@ -61,6 +61,7 @@ void gen_text(storage_t storage, param_t p, stat_t *s) {
 
 		node = lookup_tree(storage.tree, buf, p.n_gram);
 	}
+	fprintf(p.output, "\n");
 
 	free(buf);
 	fclose(p.output);

@@ -3,6 +3,10 @@
 
 #include "stdio.h"
 
+#define DEFAULT_NUMBER_OF_WORDS 100
+#define DEFAULT_NUMBER_OF_PARAGRAPHS 6
+#define DEFAULT_N_GRAM 2
+
 typedef struct {
 	
 	int n_words; // liczba slow do wygenerowania
