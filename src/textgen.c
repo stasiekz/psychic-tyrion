@@ -24,7 +24,7 @@ void gen_text(storage_t storage, param_t p, stat_t *s) {
 
 	int i;
 	int n = 0; // zmienna do liczenia liczby slow wydrukowanych
-	int parag = p.n_words / p.n_parag;
+	int parag = p.n_words / p.n_parag+1;
 	int prefix_size = p.n_gram == 1 ? 1 : p.n_gram-1;
 	char **buf = malloc (prefix_size*sizeof*buf);
 	char *suffix;
@@ -33,7 +33,8 @@ void gen_text(storage_t storage, param_t p, stat_t *s) {
 
 	while( n < p.n_words ) {
 
-		if( n % parag == 0 ) fprintf(p.output, "\n\t@");
+		if( n % parag == 0 ) fprintf(p.output, n == 0 ? "\t" : "\n\t");
+
 		if( !node ) { // nie ma takiego ngramu(prefixu)
 			node = storage.v->n[ rand()%storage.v->n_nodes ]; // losuj wezel drzewa
 
