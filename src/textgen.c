@@ -33,12 +33,12 @@ void gen_text(storage_t storage, param_t p, stat_t *s) {
 
 	while( n < p.n_words ) {
 
+		if( n % parag == 0 ) fprintf(p.output, "\n\t@");
 		if( !node ) { // nie ma takiego ngramu(prefixu)
 			node = storage.v->n[ rand()%storage.v->n_nodes ]; // losuj wezel drzewa
 
 			if( p.n_gram == 1) { // unigram
 
-				if( n % parag == 0 ) fprintf(p.output, "\t");
 				fprintf(p.output, "%s ", node->d->prefix[0]); // wypisz prefix
 				node = NULL;
 				n++;
