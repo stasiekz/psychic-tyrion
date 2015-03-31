@@ -4,10 +4,22 @@
 #include <getopt.h>
 #include <stdio.h>
 
+
+void close_files(FILE **f, int n) {
+
+	int i;
+	if( !f )
+		return;
+
+	for(i = 0; i < n; i ++)
+		fclose(f[i]);
+	free(f);
+}
+
+
 int parse_args(int argc, char **argv, param_t *p) {
 
 	int next_option;
-	int i;
 
 	/* A string listing valid short options letters.  */
 	const char* const short_options = "f:w:p:n:s:o:b:h";
@@ -31,7 +43,6 @@ int parse_args(int argc, char **argv, param_t *p) {
 	p->gen_stat = 0;
 
 	p->input = NULL;
-	p->inputs = 0;
 	p->output = stdout;
 	p->stat_file = stdout;
 
@@ -46,13 +57,10 @@ int parse_args(int argc, char **argv, param_t *p) {
 				for(p->inputs = 0; optind < argc && *argv[optind] != '-'; optind++) {
 
 					p->input = realloc(p->input, (p->inputs+1)*sizeof*p->input); // poszerz tablice uchytow do plikow o 1
-					p->input[p->inputs] = fopen(argv[optind], "r");
 
-					if(p->input[p->inputs] == NULL) { // problem z plikiem
-						fprintf(stderr, "%s: Nie moge otowrzyc pliku: \"%s\".\n", argv[0], argv[optind]);
-						for(i = 0; i < p->inputs; i++)
-							fclose(p->input[i]);
-						free(p->input);
+					if( (p->input[p->inputs] = fopen(argv[optind], "r")) == NULL ) {
+						fprintf(stderr, "%s: Nie moge otworzyc pliku: \"%s\".\n", argv[0], argv[optind]);
+						close_files(p->input, p->inputs);
 						exit(1);
 					}
 					p->inputs++;
@@ -62,29 +70,45 @@ int parse_args(int argc, char **argv, param_t *p) {
 				break;
 
 			case 'w': 
-				if( (p->n_words = atoi(optarg) ) <= 0 )
-					exit(2); // TODO zwolnic pliki
+				if( (p->n_words = atoi(optarg) ) <= 0 ) {
+					fprintf(stderr, "%s: Nieprawidlowy paramter opcji -w \"%s\"\n", argv[0], optarg);
+					close_files(p->input, p->inputs);
+					exit(2);
+				}
 				break;
 
 			case 'p':  
-				if( (p->n_parag = atoi(optarg) ) <= 0 )
-					exit(2); // TODO zwolnic pliki
+				if( (p->n_parag = atoi(optarg) ) <= 0 ) {
+					fprintf(stderr, "%s: Nieprawidlowy paramter opcji -p \"%s\"\n", argv[0], optarg);
+					close_files(p->input, p->inputs);
+					exit(2);
+				}
 				break;
 
 			case 'n':   
-				if( (p->n_gram = atoi(optarg) ) <= 0 )
-					exit(2); // TODO zwolnic pliki
+
+				if( (p->n_gram = atoi(optarg) ) <= 0 ){
+					fprintf(stderr, "%s: Nieprawidlowy paramter opcji -n \"%s\"\n", argv[0], optarg);
+					close_files(p->input, p->inputs);
+					exit(2);
+				}
 				break;
 
 			case 's':   
 				p->gen_stat = 1;
-				p->stat_file = fopen(optarg, "w");
+
+				if( !( p->stat_file = fopen(optarg, "w")) ) {
+					fprintf(stderr, "%s: nie moge utworzyc pliku wynikowego: \"%s\"", argv[0], optarg);
+					close_files(p->input, p->inputs);
+					exit(3);
+				}
 				break;
 
 			case 'o':   
 				if( !( p->output = fopen(optarg, "w")) ) {
 					fprintf(stderr, "%s: nie moge utworzyc pliku wynikowego: \"%s\"", argv[0], optarg);
-					exit(3); // TODO zwolnic pliki
+					close_files(p->input, p->inputs);
+					exit(3);
 				}
 				break;
 

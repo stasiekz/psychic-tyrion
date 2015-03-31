@@ -25,4 +25,6 @@ typedef struct {
 
 int parse_args(int argc, char **argv, param_t *s);
 
+void close_files( FILE **f, int n);
+
 #endif
