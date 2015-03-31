@@ -130,6 +130,14 @@ int parse_args(int argc, char **argv, param_t *p) {
 
 	} while (next_option != -1);
 
+	if(p->n_parag > p->n_words) {
+		fprintf(stderr, "%s: Blad ! liczba paragrafow[%d] > liczba slow[%d]\n", argv[0], p->n_parag, p->n_words);
+		close_files(p->input, p->inputs);
+		fclose(p->output);
+		fclose(p->stat_file);
+		exit(2);
+	}
+
 	return 0;
 
 }
