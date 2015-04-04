@@ -123,7 +123,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 			case 'b':   
 				if( are_files ) { // utworz baze jezeli sa pliki wejsciowe
 					if( !( p->base_file = fopen(optarg, "wb")) ) {
-						fprintf(stderr, "%s: nie moge utworzyc pliku bazowego: \"%s\"", argv[0], optarg);
+						fprintf(stderr, "%s: nie moge utworzyc pliku bazowego: \"%s\"\n", argv[0], optarg);
 						close_files(p->input, p->inputs);
 						exit(3);
 					}
@@ -132,7 +132,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 				}
 				else {
 					if( !( p->base_file = fopen(optarg, "rb")) ) {
-						fprintf(stderr, "%s: nie moge otworzyc pliku bazowego: \"%s\"", argv[0], optarg);
+						fprintf(stderr, "%s: nie moge otworzyc pliku bazowego: \"%s\"\n", argv[0], optarg);
 						fclose(p->stat_file);
 						fclose(p->output);
 						exit(3);

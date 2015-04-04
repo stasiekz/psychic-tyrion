@@ -49,11 +49,12 @@ int main(int argc, char **argv) {
 	/* wczytaj pliki tekstowe i zapisz 
 	   dane do drzewa + dodaj dane statystyczne
 	 */
-	if( p.read_base ) 
+	if( p.read_base ) {
 		if ( deserialize_storage(&storage, &p) ) {
 			fprintf(stderr, "%s: Bledny plik posredni\n", argv[0]);
 			return 1;
 		}
+	}
 	else {
 		read(&storage, p, &stat);
 
