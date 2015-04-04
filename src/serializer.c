@@ -71,34 +71,37 @@ void serialize_connections(FILE *out, tree_t t, param_t p) {
 
 }
 
-void serialize_storage(FILE *out, storage_t s, param_t p) {
+void serialize_storage(storage_t s, param_t p) {
 
 
 	//	fwrite(&s.v->cap_nodes, sizeof s.v->cap_nodes, 1, out);
-	fwrite(&s.v->n_nodes, sizeof s.v->n_nodes, 1, out);
-	fwrite(&p.n_gram, sizeof p.n_gram, 1, out);
+	fwrite(&s.v->n_nodes, sizeof s.v->n_nodes, 1, p.base_file);
+	fwrite(&p.n_gram, sizeof p.n_gram, 1, p.base_file);
 
-	serialize_data(out, s.tree, p);
+	serialize_data(p.base_file, s.tree, p);
 	nnum = 0;
-	serialize_connections(out, s.tree, p);
+	serialize_connections(p.base_file, s.tree, p);
 
+	fclose(p.base_file);
 }
 
 
-void deserialize_storage(FILE *in, storage_t *s, param_t *p) {
+void deserialize_storage(storage_t *s, param_t *p) {
 
 	s->v = malloc(sizeof*s->v); // przydziel pamiec na strukture ze wskaznikami na wezly drzewa
 
-	fread(&s->v->n_nodes, sizeof(s->v->n_nodes), 1, in);
-	fread(&p->n_gram, sizeof(p->n_gram), 1, in);
+	fread(&s->v->n_nodes, sizeof(s->v->n_nodes), 1, p->base_file);
+	fread(&p->n_gram, sizeof(p->n_gram), 1, p->base_file);
 
 	s->v->n = NULL; // ??
 	s->v->n = calloc(s->v->n_nodes, sizeof*s->v->n); // przydziel pamiec na tablice wskaznikow na wezly drzewa
 
-	deserialize_data(in, s->v->n, p, s);
+	deserialize_data(p->base_file, s->v->n, p, s);
 	nnum = 0;
-	deserialize_connections(in, s, p);
+	deserialize_connections(p->base_file, s, p);
 	s->tree = s->v->n[0]; // przypisz pierwszy element tablicy wskaznikow na wezly do korzenia drzewa
+
+	fclose(p->base_file);
 
 }
 

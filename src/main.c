@@ -49,19 +49,13 @@ int main(int argc, char **argv) {
 	/* wczytaj pliki tekstowe i zapisz 
 	   dane do drzewa + dodaj dane statystyczne
 	 */
-/*
-	if ( read(&storage, p, &stat) ) {
-		;	
-	}
-*/
-
 	if( p.read_base ) 
-		deserialize_storage(p.base_file, &storage, &p);
+		deserialize_storage(&storage, &p);
 	else {
 		read(&storage, p, &stat);
 
 		if( p.make_base )
-			serialize_storage(p.base_file, storage, p);
+			serialize_storage(storage, p);
 	}
 			
 

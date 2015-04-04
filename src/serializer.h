@@ -12,9 +12,9 @@ void serialize_data(FILE *out, tree_t t, param_t p);
 
 void serialize_connections(FILE *out, tree_t t, param_t p);
 
-void serialize_storage(FILE *out, storage_t s, param_t p);
+void serialize_storage(storage_t s, param_t p);
 
-void deserialize_storage(FILE *in, storage_t *s, param_t *p);
+void deserialize_storage(storage_t *s, param_t *p);
 
 data_t * fread_data(FILE *in, data_t *d, param_t *p);
 
