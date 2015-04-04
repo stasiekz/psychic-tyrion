@@ -3,12 +3,32 @@
 #include "argparser.h"
 #include "textgen.h"
 #include "statgen.h"
+#include "serializer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-char *usage = "";
+
+
+char *usage = 	"\n\n********** GENERATOR TEKSTU **********\n"
+		"SPOSOB UZYCIA :                       \n\n"
+		"./markowgen -f [FILE...] [OPTIONS]\n\n"
+		"[OPTIONS]:\n\n"
+		"\t-w, --nwords=N\n\n"
+		"\t\tgeneruje tekst wyjściowy składający się z N słów. Wartość domyślna N=100.\n"
+		"\t-p, --nparag=P\n\n"
+		"\t\tgeneruje tekst wyjściowy o P akapitach.Wartość domyślna P=4.\n"
+		"\t-n, --n-gram=N\n\n"
+		"\t\tgeneruje tekst na podstawie N-gramów.Wartość domyślna N=2.\n"
+		"\t-s, --stat=FILE\n\n"
+		"\t\tgeneruje statystykę tekstów we-wy do pliku FILE. Domyślnie FILE=stdout.\n"
+		"\t-o, --output=FILE\n\n"
+		"\t\tzapisuje wygenerowany tekst do pliku FILE. Domyślnie FILE=stdout.\n"
+		"\t-h, --help\n\n"
+		"\t\twyświetla sposób użytkowania programu.\n"
+		"\t-b, --basefile=BASEFILE\n\n"
+		"\t\twczytuje dane z pliku bazowego.\n\n";
 
 int main(int argc, char **argv) {
 
@@ -20,18 +40,31 @@ int main(int argc, char **argv) {
 	 */	
 	parse_args(argc, argv, &p);
 
-	if(argc == 1 || p.show_help == 1 ) {
-		printf("%s%d\n", usage);
-		exit(2); // TODO
+	if(argc == 1  ) {
+		printf("%s\n", usage);
+		return 2; // TODO
 	}
 
 
 	/* wczytaj pliki tekstowe i zapisz 
 	   dane do drzewa + dodaj dane statystyczne
 	 */
+/*
 	if ( read(&storage, p, &stat) ) {
 		;	
 	}
+*/
+
+	if( p.read_base ) 
+		deserialize_storage(p.base_file, &storage, &p);
+	else {
+		read(&storage, p, &stat);
+
+		if( p.make_base )
+			serialize_storage(p.base_file, storage, p);
+	}
+			
+
 	/* generuj tekst + dodaj dane stat.
 	 */
 	gen_text(storage, p, &stat);
