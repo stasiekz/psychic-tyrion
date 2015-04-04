@@ -42,7 +42,6 @@ int parse_args(int argc, char **argv, param_t *p) {
 	p->n_gram = DEFAULT_N_GRAM;
 	p->show_help = 1;
 	p->gen_stat = 0;
-	//////	
 	p->read_base = 0;
 	p->make_base = 0;
 
@@ -57,7 +56,10 @@ int parse_args(int argc, char **argv, param_t *p) {
 		{
 			case 'f':
 
-				are_files = 1;
+				if( optarg[0] == '-'){
+					fprintf(stderr, "%s: niepoprawny argument opcji -f  \"%s\"\n", argv[0], optarg);
+					exit(2);
+				}
 				optind--;
 				for(p->inputs = 0; optind < argc && *argv[optind] != '-'; optind++) {
 
@@ -72,6 +74,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 
 				} 
 				p->show_help = 0;
+				are_files = 1;
 				break;
 
 			case 'w': 
@@ -160,7 +163,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 		fclose(p->output);
 		fclose(p->stat_file);
 		p->show_help = 1;
-		return 2;
+		exit(2);
 
 	}
 
