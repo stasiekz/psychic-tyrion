@@ -14,6 +14,8 @@ typedef struct {
 	int n_gram;
 	int show_help; // zmienna logiczna do wyswietlania helpa
 	int gen_stat; // zmienna logiczna do wyswietlania statystyk
+	int read_base;
+	int make_base;
 
 	FILE **input; //  bedzie tablica uchwytow do plikow wejsciowych
 	int inputs; // liczba plikow wejsciowych

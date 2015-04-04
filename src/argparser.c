@@ -20,6 +20,7 @@ void close_files(FILE **f, int n) {
 int parse_args(int argc, char **argv, param_t *p) {
 
 	int next_option;
+	int are_files = 0;
 
 	/* A string listing valid short options letters.  */
 	const char* const short_options = "f:w:p:n:s:o:b:h";
@@ -41,6 +42,9 @@ int parse_args(int argc, char **argv, param_t *p) {
 	p->n_gram = DEFAULT_N_GRAM;
 	p->show_help = 1;
 	p->gen_stat = 0;
+	//////	
+	p->read_base = 0;
+	p->make_base = 0;
 
 	p->input = NULL;
 	p->output = stdout;
@@ -53,6 +57,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 		{
 			case 'f':
 
+				are_files = 1;
 				optind--;
 				for(p->inputs = 0; optind < argc && *argv[optind] != '-'; optind++) {
 
@@ -113,7 +118,24 @@ int parse_args(int argc, char **argv, param_t *p) {
 				break;
 
 			case 'b':   
-				p->base_file = fopen(optarg, "r"); // TODO ?
+				if( are_files ) { // utworz baze jezeli sa pliki wejsciowe
+					if( !( p->base_file = fopen(optarg, "wb")) ) {
+						fprintf(stderr, "%s: nie moge utworzyc pliku bazowego: \"%s\"", argv[0], optarg);
+						close_files(p->input, p->inputs);
+						exit(3);
+					}
+
+					p->make_base = 1;
+				}
+				else {
+					if( !( p->base_file = fopen(optarg, "rb")) ) {
+						fprintf(stderr, "%s: nie moge otworzyc pliku bazowego: \"%s\"", argv[0], optarg);
+						fclose(p->stat_file);
+						fclose(p->output);
+						exit(3);
+					}	
+					p->read_base = 1;
+				}
 				break;
 
 			case 'h':   
@@ -129,6 +151,18 @@ int parse_args(int argc, char **argv, param_t *p) {
 		}
 
 	} while (next_option != -1);
+
+	if( optind < argc ) {
+		fprintf( stderr, "\n%s: Zly parametr:\n", argv[0] );
+		for( ; optind < argc; optind++ )
+			fprintf( stderr, "\t\"%s\"\n", argv[optind] );
+		close_files(p->input, p->inputs);
+		fclose(p->output);
+		fclose(p->stat_file);
+		p->show_help = 1;
+		return 2;
+
+	}
 
 	if(p->n_parag > p->n_words) {
 		fprintf(stderr, "%s: Blad ! liczba paragrafow[%d] > liczba slow[%d]\n", argv[0], p->n_parag, p->n_words);
