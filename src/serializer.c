@@ -52,7 +52,7 @@ void serialize_connections(FILE *out, tree_t t, param_t p) {
 
 	if( t == NULL) {
 		dir = 0;
-		fwrite(&dir, sizeof(dir), 1, out); // wypisz 0 zamiast NULLa
+		fwrite( &dir, sizeof(dir), 1, out); // wypisz 0 zamiast NULLa
 		return;
 	}
 
@@ -74,7 +74,6 @@ void serialize_connections(FILE *out, tree_t t, param_t p) {
 void serialize_storage(storage_t s, param_t p) {
 
 
-	//	fwrite(&s.v->cap_nodes, sizeof s.v->cap_nodes, 1, out);
 	fwrite(&s.v->n_nodes, sizeof s.v->n_nodes, 1, p.base_file);
 	fwrite(&p.n_gram, sizeof p.n_gram, 1, p.base_file);
 
@@ -93,10 +92,9 @@ void deserialize_storage(storage_t *s, param_t *p) {
 	fread(&s->v->n_nodes, sizeof(s->v->n_nodes), 1, p->base_file);
 	fread(&p->n_gram, sizeof(p->n_gram), 1, p->base_file);
 
-	s->v->n = NULL; // ??
 	s->v->n = calloc(s->v->n_nodes, sizeof*s->v->n); // przydziel pamiec na tablice wskaznikow na wezly drzewa
 
-	deserialize_data(p->base_file, s->v->n, p, s);
+	deserialize_data(p->base_file, p, s);
 	nnum = 0;
 	deserialize_connections(p->base_file, s, p);
 	s->tree = s->v->n[0]; // przypisz pierwszy element tablicy wskaznikow na wezly do korzenia drzewa
@@ -123,7 +121,8 @@ data_t * fread_data(FILE *in, data_t *d, param_t *p) { // TODO
 
 	fread(&d->n_suff, sizeof(d->n_suff), 1, in);
 
-	d->suffix = malloc(d->n_suff*sizeof*d->suffix);
+	if(d->n_suff > 0 )
+		d->suffix = malloc(d->n_suff*sizeof*d->suffix);
 
 
 	for(i = 0; i < d->n_suff; i++) { // zczytaj suffixy
@@ -135,12 +134,12 @@ data_t * fread_data(FILE *in, data_t *d, param_t *p) { // TODO
 	return d;
 }
 
-void deserialize_data(FILE *in, node_t **n, param_t *p, storage_t *s) {
+void deserialize_data(FILE *in, param_t *p, storage_t *s) {
 
 	int i, tmp;
 
 	for(i = 0; i < s->v->n_nodes; i++) {
-		fread(&tmp, sizeof tmp, 1, in); // ?? opusc zbedny numer TODO
+		fread(&tmp, sizeof tmp, 1, in); // ?? opusc zbedny numer 
 		s->v->n[i] = malloc(sizeof*s->v->n[i]); // wezel drzewa
 		s->v->n[i]->d = fread_data(in, s->v->n[i]->d, p);
 	}
@@ -150,7 +149,7 @@ void deserialize_data(FILE *in, node_t **n, param_t *p, storage_t *s) {
 void deserialize_connections(FILE *in, storage_t *s, param_t *p) {
 
 	int i, dir, pos_1, pos_2;
-	fread(&i, sizeof(i), 1, in); // pomin pierwsza liczbe TODO
+	fread(&i, sizeof(i), 1, in); // pomin pierwsza liczbe 
 
 	for(i = 0; i < 2*s->v->n_nodes; i++) {
 
@@ -158,12 +157,11 @@ void deserialize_connections(FILE *in, storage_t *s, param_t *p) {
 		fread(&pos_1, sizeof(pos_1), 1, in);
 		fread(&pos_2, sizeof(pos_2), 1, in);
 
-		if(dir == 1) {
+		if(dir == 1) 
 			s->v->n[pos_1]->left = (pos_2 != 0) ? s->v->n[pos_2] : NULL;
 
-		} else {
+		else 
 			s->v->n[pos_1]->right = (pos_2 != 0) ? s->v->n[pos_2] : NULL;
-		}
 
 	}
 }
