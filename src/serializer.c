@@ -81,21 +81,39 @@ void serialize_storage(storage_t s, param_t p) {
 }
 
 
-void deserialize_storage(storage_t *s, param_t *p) {
+int deserialize_storage(storage_t *s, param_t *p) {
 
 	s->v = malloc(sizeof*s->v); // przydziel pamiec na strukture ze wskaznikami na wezly drzewa
 
-	fread(&s->v->n_nodes, sizeof(s->v->n_nodes), 1, p->base_file);
-	fread(&p->n_gram, sizeof(p->n_gram), 1, p->base_file);
+	if ( !fread(&s->v->n_nodes, sizeof(s->v->n_nodes), 1, p->base_file) ||
+		!fread(&p->n_gram, sizeof(p->n_gram), 1, p->base_file)  || 
+		s->v->n_nodes <= 0 || p->n_gram <= 0) {
+			free(s->v);
+			fclose(p->base_file);
+			return 1;
+	}
+		
 
-	s->v->n = calloc(s->v->n_nodes, sizeof*s->v->n); // przydziel pamiec na tablice wskaznikow na wezly drzewa
+	if ( !(s->v->n = calloc(s->v->n_nodes, sizeof*s->v->n) ) ) { // przydziel pamiec na tablice wskaznikow na wezly drzewa
+		free(s->v);
+		fclose(p->base_file);
+		return 1;
+	}
+		
 
-	deserialize_data(p->base_file, p, s);
-	deserialize_connections(p->base_file, s, p);
+	if ( deserialize_data(p->base_file, p, s) || 
+		deserialize_connections(p->base_file, s, p) ) {
+		free(s->v->n);
+		free(s->v);
+		fclose(p->base_file);
+		return 1;
+	
+	}
 	s->tree = s->v->n[0]; // przypisz pierwszy element tablicy wskaznikow na wezly do korzenia drzewa
 
 	fclose(p->base_file);
 
+	return 0;
 }
 
 data_t * fread_data(FILE *in, data_t *d, param_t *p) { 
@@ -105,52 +123,88 @@ data_t * fread_data(FILE *in, data_t *d, param_t *p) {
 
 	d = malloc(sizeof*d);
 
-	d->prefix = malloc(prefix_size*sizeof*d->prefix);
+	if ( !(d->prefix = malloc(prefix_size*sizeof*d->prefix) ) ) {
+		free(d);
+		return NULL;
+	}
 
 
 	for(i = 0; i < prefix_size; i++) { // zczytaj suffixy
-		fread(&size, sizeof(size), 1, in);
+		if ( !fread(&size, sizeof(size), 1, in) || size <= 0 ) {
+			free(d->prefix);
+			free(d);
+			return NULL;
+		}
 		d->prefix[i] = malloc(size);
-		fread(d->prefix[i], sizeof*d->prefix[i], size, in);
+		if ( fread(d->prefix[i], sizeof*d->prefix[i], size, in) != size ){
+			free(d->prefix);
+			free(d);
+			return NULL;
+		}
 	}
 
-	fread(&d->n_suff, sizeof(d->n_suff), 1, in);
+	if ( !fread(&d->n_suff, sizeof(d->n_suff), 1, in) || d->n_suff < 0 ) {
+		free(d);
+		return NULL;
+	}
 
 	if(d->n_suff > 0 )
 		d->suffix = malloc(d->n_suff*sizeof*d->suffix);
 
 
 	for(i = 0; i < d->n_suff; i++) { // zczytaj suffixy
-		fread(&size, sizeof(size), 1, in);
+		if ( !fread(&size, sizeof(size), 1, in) || size <= 0) {
+			free(d->prefix);
+			free(d->suffix);
+			free(d);
+			return NULL;
+		}
 		d->suffix[i] = malloc(size);
-		fread(d->suffix[i], sizeof*d->suffix[i], size, in);
+		if ( fread(d->suffix[i], sizeof*d->suffix[i], size, in) != size ) {
+			free(d->prefix);
+			free(d->suffix);
+			free(d);
+			return NULL;
+		}
 	}
 
 	return d;
 }
 
-void deserialize_data(FILE *in, param_t *p, storage_t *s) {
+int deserialize_data(FILE *in, param_t *p, storage_t *s) {
 
 	int i;
 
 	for(i = 0; i < s->v->n_nodes; i++) {
 		s->v->n[i] = malloc(sizeof*s->v->n[i]); // wezel drzewa
-		s->v->n[i]->d = fread_data(in, s->v->n[i]->d, p);
+		if ( !(s->v->n[i]->d = fread_data(in, s->v->n[i]->d, p) ) ) {
+			free(s->v->n[i]);
+			return 1;
+		}
 	}
+	
+	return 0;
 
 }
 
-void deserialize_connections(FILE *in, storage_t *s, param_t *p) {
+int deserialize_connections(FILE *in, storage_t *s, param_t *p) {
 
 	int i, dir, pos_1, pos_2;
 
-	fseek(in, sizeof(int), SEEK_CUR);
+	if ( fseek(in, sizeof(int), SEEK_CUR) )
+		return 1;
 
 	for(i = 0; i < 2*s->v->n_nodes; i++) {
 
-		fread(&dir, sizeof(dir), 1, in);
-		fread(&pos_1, sizeof(pos_1), 1, in);
-		fread(&pos_2, sizeof(pos_2), 1, in);
+		if ( !fread(&dir, sizeof(dir), 1, in) ||
+			!fread(&pos_1, sizeof(pos_1), 1, in) ||
+			!fread(&pos_2, sizeof(pos_2), 1, in) ||
+			(dir != 1 && dir != 2 && dir != 0) ||
+			pos_1 < 0 ||
+			pos_2 < 0 ||
+			(pos_1 >= s->v->n_nodes) ||
+			(pos_2 >= s->v->n_nodes) )
+				return 1;
 
 		if(dir == 1) 
 			s->v->n[pos_1]->left = (pos_2 != 0) ? s->v->n[pos_2] : NULL;
@@ -159,6 +213,8 @@ void deserialize_connections(FILE *in, storage_t *s, param_t *p) {
 			s->v->n[pos_1]->right = (pos_2 != 0) ? s->v->n[pos_2] : NULL;
 
 	}
+
+	return 0;
 }
 
 

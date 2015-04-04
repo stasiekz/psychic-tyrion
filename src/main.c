@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 
 	if(argc == 1  ) {
 		printf("%s\n", usage);
-		return 2; // TODO
+		return 2;
 	}
 
 
@@ -50,7 +50,10 @@ int main(int argc, char **argv) {
 	   dane do drzewa + dodaj dane statystyczne
 	 */
 	if( p.read_base ) 
-		deserialize_storage(&storage, &p);
+		if ( deserialize_storage(&storage, &p) ) {
+			fprintf(stderr, "%s: Bledny plik posredni\n", argv[0]);
+			return 1;
+		}
 	else {
 		read(&storage, p, &stat);
 

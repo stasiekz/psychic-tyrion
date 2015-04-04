@@ -162,6 +162,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 		close_files(p->input, p->inputs);
 		fclose(p->output);
 		fclose(p->stat_file);
+		fclose(p->base_file);
 		p->show_help = 1;
 		exit(2);
 
@@ -172,6 +173,7 @@ int parse_args(int argc, char **argv, param_t *p) {
 		close_files(p->input, p->inputs);
 		fclose(p->output);
 		fclose(p->stat_file);
+		fclose(p->base_file);
 		exit(2);
 	}
 
