@@ -33,13 +33,10 @@ void fwrite_data(FILE *out, data_t *d, param_t p) {
 
 void serialize_data(FILE *out, tree_t t, param_t p) {
 
-	int tmp = nnum;
 
 	if( t == NULL) return;
 
-	fwrite(&tmp, sizeof(tmp), 1, out); // wypisz numer wezla
 	fwrite_data(out, t->d, p);
-	nnum++;
 
 	serialize_data(out, t->left, p);
 	serialize_data(out, t->right, p);
@@ -78,7 +75,6 @@ void serialize_storage(storage_t s, param_t p) {
 	fwrite(&p.n_gram, sizeof p.n_gram, 1, p.base_file);
 
 	serialize_data(p.base_file, s.tree, p);
-	nnum = 0;
 	serialize_connections(p.base_file, s.tree, p);
 
 	fclose(p.base_file);
@@ -95,7 +91,6 @@ void deserialize_storage(storage_t *s, param_t *p) {
 	s->v->n = calloc(s->v->n_nodes, sizeof*s->v->n); // przydziel pamiec na tablice wskaznikow na wezly drzewa
 
 	deserialize_data(p->base_file, p, s);
-	nnum = 0;
 	deserialize_connections(p->base_file, s, p);
 	s->tree = s->v->n[0]; // przypisz pierwszy element tablicy wskaznikow na wezly do korzenia drzewa
 
@@ -103,7 +98,7 @@ void deserialize_storage(storage_t *s, param_t *p) {
 
 }
 
-data_t * fread_data(FILE *in, data_t *d, param_t *p) { // TODO
+data_t * fread_data(FILE *in, data_t *d, param_t *p) { 
 
 	int i, size;
 	int prefix_size = p->n_gram == 1 ? 1 : p->n_gram-1;
@@ -136,10 +131,9 @@ data_t * fread_data(FILE *in, data_t *d, param_t *p) { // TODO
 
 void deserialize_data(FILE *in, param_t *p, storage_t *s) {
 
-	int i, tmp;
+	int i;
 
 	for(i = 0; i < s->v->n_nodes; i++) {
-		fread(&tmp, sizeof tmp, 1, in); // ?? opusc zbedny numer 
 		s->v->n[i] = malloc(sizeof*s->v->n[i]); // wezel drzewa
 		s->v->n[i]->d = fread_data(in, s->v->n[i]->d, p);
 	}
@@ -149,7 +143,8 @@ void deserialize_data(FILE *in, param_t *p, storage_t *s) {
 void deserialize_connections(FILE *in, storage_t *s, param_t *p) {
 
 	int i, dir, pos_1, pos_2;
-	fread(&i, sizeof(i), 1, in); // pomin pierwsza liczbe 
+
+	fseek(in, sizeof(int), SEEK_CUR);
 
 	for(i = 0; i < 2*s->v->n_nodes; i++) {
 
